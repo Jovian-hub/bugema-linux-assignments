@@ -1,0 +1,190 @@
+==================================================================
+ BUGEMA LINUX DEVELOPMENT ENVIRONMENT - VERIFICATION TRANSCRIPT
+ Host: medisoft   Distribution: Ubuntu 24.04.4 LTS
+ Captured: 2026-10-20 19:58:35 CAT
+==================================================================
+
+----- 1. USER AND SYSTEM CONFIGURATION ------------------------------
+$ whoami
+medisoft
+$ id
+uid=1000(medisoft) gid=1000(medisoft) groups=1000(medisoft),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),100(users),114(lpadmin),984(ollama),1003(sunrise-team2)
+$ hostname
+medisoft
+$ hostnamectl
+ Static hostname: medisoft
+ Pretty hostname: medisoft@
+       Icon name: computer-laptop
+         Chassis: laptop 💻
+      Machine ID: f955dc0c80874562b438162a255fb4e0
+         Boot ID: 6ef81839f5d748139fb39a06331364b4
+Operating System: Ubuntu 24.04.4 LTS
+          Kernel: Linux 7.0.0-31-generic
+$ uname -a
+Linux medisoft 7.0.0-31-generic #31~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Mon Aug 10 09:38:02 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+$ lsb_release -a
+Distributor ID:	Ubuntu
+Description:	Ubuntu 24.04.4 LTS
+Release:	24.04
+Codename:	noble
+
+----- 2. HARDWARE AND RESOURCES -------------------------------------
+$ lscpu (selected)
+Architecture:                            x86_64
+CPU(s):                                  8
+Model name:                              Intel(R) Core(TM) i5-8350U CPU @ 1.70GHz
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+CPU(s) scaling MHz:                      64%
+Virtualization:                          VT-x
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       4.1Gi       1.0Gi       632Mi       3.5Gi       3.6Gi
+Swap:          4.0Gi       891Mi       3.1Gi
+$ df -h /
+Filesystem                         Size  Used Avail Use% Mounted on
+/dev/mapper/ubuntu--vg-ubuntu--lv  231G   73G  147G  34% /
+$ lspgi/graphics
+00:02.0 VGA compatible controller: Intel Corporation UHD Graphics 620 (rev 07)
+$ ls -l /dev/kvm
+crw-rw----+ 1 root kvm 10, 232 Oct 18 18:43 /dev/kvm
+
+----- 3. PACKAGE MANAGEMENT ------------------------------------------
+$ apt --version
+apt 2.8.3 (amd64)
+$ apt-get --version
+apt 2.8.3 (amd64)
+$ dpkg --version
+Debian 'dpkg' package management program version 1.22.6 (amd64).
+$ apt update (tail)
+Get:59 http://archive.ubuntu.com/ubuntu noble/restricted amd64 c-n-f Metadata [416 B]
+Get:60 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [15.0 MB]
+Ign:30 https://repo.protonvpn.com/debian stable/main all Packages
+Get:30 https://repo.protonvpn.com/debian stable/main all Packages [241 kB]
+$ apt list --installed | wc -l
+2106
+$ dpkg -l | grep -c '^ii'
+2105
+
+----- 4. NETWORK CONFIGURATION AND TESTING ---------------------------
+$ ip -brief addr
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp0s31f6        DOWN           
+wlp2s0           UP             192.168.1.57/24 fe80::6e2:2728:c1be:14f/64 
+docker0          DOWN           172.17.0.1/16 
+$ ip route
+default via 192.168.1.1 dev wlp2s0 proto dhcp src 192.168.1.57 metric 600 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+192.168.1.0/24 dev wlp2s0 proto kernel scope link src 192.168.1.57 metric 600 
+$ ping -c 4 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=110 time=78.3 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=110 time=22.2 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=110 time=19.2 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=110 time=17.6 ms
+
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3004ms
+rtt min/avg/max/mdev = 17.604/34.355/78.347/25.452 ms
+$ ping -c 4 github.com
+PING github.com (140.82.121.3) 56(84) bytes of data.
+64 bytes from lb-140-82-121-3-fra.github.com (140.82.121.3): icmp_seq=1 ttl=45 time=167 ms
+64 bytes from lb-140-82-121-3-fra.github.com (140.82.121.3): icmp_seq=2 ttl=45 time=164 ms
+64 bytes from lb-140-82-121-3-fra.github.com (140.82.121.3): icmp_seq=3 ttl=45 time=163 ms
+64 bytes from lb-140-82-121-3-fra.github.com (140.82.121.3): icmp_seq=4 ttl=45 time=162 ms
+
+--- github.com ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3003ms
+rtt min/avg/max/mdev = 162.197/164.138/166.938/1.760 ms
+$ getent hosts github.com
+140.82.121.3    github.com
+$ nmcli device status
+DEVICE          TYPE      STATE                   CONNECTION 
+wlp2s0          wifi      connected               Friday@    
+lo              loopback  connected (externally)  lo         
+docker0         bridge    connected (externally)  docker0    
+p2p-dev-wlp2s0  wifi-p2p  disconnected            --         
+
+----- 5. GIT INSTALLATION AND CONFIGURATION -------------------------
+$ git --version
+git version 2.43.0
+$ git config --global --list
+user.name=NAMBALIRWA JOVIA
+user.email=jovianambalirwa38@gmail.com
+credential.https://dev.azure.com.usehttppath=true
+credential.helper=!gh auth git-credential
+credential.https://github.com.helper=
+credential.https://github.com.helper=!/home/medisoft/.local/bin/gh auth git-credential
+credential.https://gist.github.com.helper=
+credential.https://gist.github.com.helper=!/home/medisoft/.local/bin/gh auth git-credential
+$ git config --global credential.helper
+!gh auth git-credential
+
+----- 6. GITHUB CLI AND AUTHENTICATION ------------------------------
+$ gh --version
+gh version 2.102.0 (2026-09-30)
+$ gh auth status
+github.com
+  ✓ Logged in to github.com account Jovian-hub (keyring)
+  - Active account: true
+  - Git operations protocol: https
+  - Token: <token redacted>************************************
+  - Token scopes: 'gist', 'read:org', 'repo'
+
+----- 7. BUGEMA LINUX REPOSITORY CLONE TEST -------------------------
+$ git clone https://github.com/bos-com/bugema-linux.git
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+$ git log --oneline -5
+8b13a20 docs: add Bugema Linux architecture foundation (#7)
+4e7dd98 docs: add student contribution issue template (#6)
+f3d702a docs: add bug report issue template (#5)
+c151ed8 docs: add Bugema Linux development roadmap
+b45c847 docs: add project support guide
+$ git branch -a
+* main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/clean-up-readme
+  remotes/origin/docs/bug-report-template
+  remotes/origin/kmuwanga83-patch-1
+  remotes/origin/kmuwanga83-patch-2
+  remotes/origin/main
+$ ls
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+docs
+GOVERNANCE.md
+LICENSE
+README.md
+ROADMAP.md
+SECURITY.md
+SUPPORT.md
+
+----- 8. DEVELOPMENT TOOLS -------------------------------------------
+git        git version 2.43.0
+gh         gh version 2.102.0 (2026-09-30)
+python3    Python 3.12.3
+curl       curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.10
+wget       GNU Wget 1.21.4 built on linux-gnu.
+vim        not installed
+java       openjdk 11.0.32 2026-07-21
+gcc        gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+make       GNU Make 4.3
+systemctl  systemd 255 (255.4-1ubuntu8.17)
+
+----- 9. VIRTUALISATION PLATFORM (QEMU/KVM) --------------------------
+$ qemu-system-x86_64 --version
+QEMU emulator version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.16)
+$ qemu-img --version
+qemu-img version 8.2.2 (Debian 1:8.2.2+ds-0ubuntu1.16)
+$ qemu-system-x86_64 -accel help
+Accelerators supported in QEMU binary:
+tcg
+kvm
+
+==================================================================
+ END OF TRANSCRIPT
+==================================================================
